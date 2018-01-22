@@ -47,6 +47,7 @@ class Dataset(object):
         # test data
         self.x_test, self.y_test = test[range(len(test))][0], test[range(len(test))][1]
 
+        '''
         # Subtract the mean of training data for each channel and divide by the std
         if dataset_name == 'cifar10' or  dataset_name == 'cifar100':
             mean = self.x_train.mean(axis=(0, 2, 3))[np.newaxis, :, np.newaxis, np.newaxis]
@@ -68,7 +69,7 @@ class Dataset(object):
         #self.x_train -= x_mean
         #self.x_valid -= x_mean
         #self.x_test -= x_mean
-
+        '''
     def data_augmentation(self, x_train):
         if self.dataset_name != 'cifar10' and self.dataset_name != 'cifar100':
             print('Our data augmentation does not support this dataset...')

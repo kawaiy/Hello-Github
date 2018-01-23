@@ -14,6 +14,8 @@ if __name__ == '__main__':
                        [1 / 9, 1 / 9, 1 / 9],
                        [1 / 9, 1 / 9, 1 / 9]])
 
-    print(data.x_train[0][0])
-    dst = cv2.filter2D(data.x_train[0][0],-1,kernel)
+    print(data.x_train[1][0])
+    dst = cv2.filter2D(data.x_train[1][0],-1,kernel)
+    cv2.imwrite("test_before.png",data.x_train[1][0])
+    #cv2.imwrite("test_before2.png", x[1][0])
     cv2.imwrite("test.png",dst)

@@ -3,7 +3,9 @@
 
 import chainer
 import numpy as np
-
+from chainer.datasets import tuple_dataset
+from PIL import Image
+import glob
 
 class Dataset(object):
     def __init__(self, dataset_name, valid_data_ratio=0.):
@@ -17,6 +19,7 @@ class Dataset(object):
             self.channel = 3
             self.pad_size = 4
             train, test = chainer.datasets.get_cifar10(withlabel=True, ndim=3, scale=255.0)
+            print(train)#<chainer.datasets.tuple_dataset.TupleDataset object at 0x114bcfac8>
         elif dataset_name == 'cifar100':
             self.n_class = 100
             self.channel = 3
@@ -30,9 +33,52 @@ class Dataset(object):
         elif dataset_name == 'mnist_flat':
             self.n_class = 10
             train, test = chainer.datasets.get_mnist(withlabel=True, ndim=1, scale=1.0)
+        elif dataset_name == 'mit':
+            self.n_class = 8
+
+            pathsAndLabels = []
+            pathsAndLabels.append(np.asarray(["dataset/coast/", 0]))
+            pathsAndLabels.append(np.asarray(["dataset/inside_city/", 1]))
+            pathsAndLabels.append(np.asarray(["dataset/forest/", 2]))
+            pathsAndLabels.append(np.asarray(["dataset/highway/", 3]))
+            pathsAndLabels.append(np.asarray(["dataset/Opencountry/", 4]))
+            pathsAndLabels.append(np.asarray(["dataset/street/", 5]))
+            pathsAndLabels.append(np.asarray(["dataset/tallbuilding/", 6]))
+            pathsAndLabels.append(np.asarray(["dataset/mountain/", 7]))
+
+            allData = []
+            for pathAndLabel in pathsAndLabels:
+                path = pathAndLabel[0]
+                # print(path)
+                label = pathAndLabel[1]
+                imagelist = glob.glob(path + "*.jpg")
+                for imgName in imagelist:
+                    allData.append([imgName, label])
+            allData = np.random.permutation(allData)
+
+            imageData = []
+            labelData = []
+            for pathAndLabel in allData:
+                img = Image.open(pathAndLabel[0])
+                r, g, b = img.split()
+                rImgData = np.asarray(np.float32(r) / 255.0)
+                gImgData = np.asarray(np.float32(g) / 255.0)
+                bImgData = np.asarray(np.float32(b) / 255.0)
+                imgData = np.asarray([rImgData, gImgData, bImgData])
+                imageData.append(imgData)
+                labelData.append(np.int32(pathAndLabel[1]))
+
+            threshold = np.int32(len(imageData) / 8 * 7)
+            train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
+            test = tuple_dataset.TupleDataset(imageData[threshold:], labelData[threshold:])
+
+            print(train) #<chainer.datasets.tuple_dataset.TupleDataset object at 0x10d1fff28>
+            #self.x_train, self.y_train = train[:][0], train[:][1]
+            #self.x_test, self.y_test = test[range(len(test))][0], test[range(len(test))][1]
+
         else:
-            print('Invalid dataset name at dataset()!')
-            exit(1)
+                print('Invalid dataset name at dataset()!')
+                exit(1)
 
         # split into train and validation data
         np.random.seed(2017)    # for generating fixed validation set

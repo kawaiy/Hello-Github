@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import cv2
 
 if __name__ == '__main__':
-    data = D.Dataset('cifar10',valid_data_ratio=0.)
+    data = D.Dataset('mit',valid_data_ratio=0.)
     x = chainer.Variable(data.x_train)
     t = chainer.Variable(data.y_train)
 
